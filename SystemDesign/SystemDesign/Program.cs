@@ -17,6 +17,15 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
         options.QueueLimit = 3;
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });
+
+    rateLimiterOptions.AddSlidingWindowLimiter("sliding", options =>
+    {
+        options.Window = TimeSpan.FromSeconds(15);
+        options.SegmentsPerWindow = 3;
+        options.PermitLimit = 15;
+        options.QueueLimit = 3;
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
 });
 builder.Services.AddControllers();
 
