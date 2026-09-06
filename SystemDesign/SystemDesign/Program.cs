@@ -14,8 +14,8 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
     {
         options.Window = TimeSpan.FromSeconds(10);
         options.PermitLimit = 3;
-        options.QueueLimit = 3;
-        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        //options.QueueLimit = 3;
+        //options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });
 
     rateLimiterOptions.AddSlidingWindowLimiter("sliding", options =>
@@ -23,8 +23,20 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
         options.Window = TimeSpan.FromSeconds(15);
         options.SegmentsPerWindow = 3;
         options.PermitLimit = 15;
-        options.QueueLimit = 3;
-        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        //options.QueueLimit = 3;
+        //options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+
+    rateLimiterOptions.AddTokenBucketLimiter("token", options =>
+    {
+        options.TokenLimit = 100;
+        options.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+        options.TokensPerPeriod = 10;
+    });
+
+    rateLimiterOptions.AddConcurrencyLimiter("concurrency", options =>
+    {
+        options.PermitLimit = 10;
     });
 });
 builder.Services.AddControllers();
@@ -41,6 +53,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 
