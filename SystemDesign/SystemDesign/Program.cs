@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
+using SystemDesign.NotificationService;
 using SystemDesign.UrlShortener;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +40,8 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
     });
 });
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
+builder.Services.AddHostedService<Worker>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -54,12 +56,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseRateLimiter();
-
 app.UseHttpsRedirection();
+
+app.UseDefaultFiles();
+
+app.UseStaticFiles();
+
+app.UseRateLimiter();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();
